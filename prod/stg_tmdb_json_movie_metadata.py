@@ -19,6 +19,8 @@ warnings.filterwarnings('ignore') # turn off warnings
 
 import psycopg2
 
+from core_function import *
+
 connUAT = psycopg2.connect(
      host='localhost',
      database='uat',
@@ -26,6 +28,8 @@ connUAT = psycopg2.connect(
      user='postgres',
      password='1234567890'
   )
+
+cursorUAT = connUAT.cursor()
 
 connPROC = psycopg2.connect(
      host='localhost',
@@ -35,52 +39,28 @@ connPROC = psycopg2.connect(
      password='1234567890'
   )
 
-cursorUAT = connUAT.cursor()
 cursorPROC = connPROC.cursor()
 
-def selectdf(query,conn):
-    df = pd.read_sql(query, conn)
-    return df
-  
-def SQL_push(sql_table_name,python_table,conn,cursor,inplace):
-    python_table.replace([np.nan], [None],inplace=True)
-    
-    if inplace == True:
-        try:
-            sql_query = f'truncate table {sql_table_name}'
-            cursor.execute(sql_query)
-            conn.commit()
-        except:
-            pass
-            
-    sql = f"INSERT INTO {sql_table_name} VALUES ({','.join(['%s'] * len(python_table.columns))})"
+#----------------------------------------------
 
-    data = [tuple(row) for _, row in tqdm(python_table.iterrows(), total=len(python_table), desc="Preparing data")]
+use_core = coreproc
+use_conn = connPROC
+use_cursor = cursorPROC
 
-    # Chèn dữ liệu với xử lý lỗi
-    for row in tqdm(data, total=len(data), desc="Inserting rows"):
-        try:
-            cursor.execute(sql, row)
-        except Exception as e:
-            print(f"Lỗi khi chèn dòng {row}: {e}")
-            conn.rollback()  # Hủy giao dịch khi có lỗi, tránh PostgreSQL khóa transaction
+#---------------------------------------------
 
-    # Sau khi xong thì commit lại
-    conn.commit()
-    print("PUSH DATA: DONE")
-
-def check_list(sql_table_object,connSQL):
+def check_list(sql_table_object):
     sql_query = f'''
                 select distinct id from {sql_table_object}
                 '''
-    list_sql_object = selectdf(sql_query,connSQL)
+    list_sql_object = use_core.selectdf(sql_query)
     list_sql_object.sort_values(by='id',inplace=True)
     
     sql_query = '''
             select distinct tmdbid id from staging.stg_links
             where tmdbid is not null
             '''
-    list_sql_all = selectdf(sql_query,connSQL)
+    list_sql_all = use_core.selectdf(sql_query)
     list_sql_all.sort_values(by='id',inplace=True)
     
     list_crwal = list(set(list_sql_all['id']) - set(list_sql_object['id']))
@@ -91,7 +71,7 @@ def check_list(sql_table_object,connSQL):
 
 sql_table_name = 'staging.stg_tmdb_json_movie_metadata'
 
-list_m = check_list(sql_table_name,connPROC)
+list_m = check_list(sql_table_name)
 
 for i in tqdm(list_m):
     try:
@@ -110,8 +90,8 @@ for i in tqdm(list_m):
 
         sql_q = f"INSERT INTO {sql_table_name} (id, request_json) VALUES (%s, %s)"
 
-        cursorPROC.execute(sql_q,(tmdb_id,data_str))
-        connPROC.commit()
+        use_cursor.execute(sql_q,(tmdb_id,data_str))
+        use_conn.commit()
     except:
         print(f'Lỗi dữ liệu: {i}')
 
@@ -121,8 +101,8 @@ sql_query = f'''
                 WHERE request_json LIKE '%: ""%';
             '''
 
-cursorPROC.execute(sql_query)
-connPROC.commit()
+use_cursor.execute(sql_query)
+use_conn.commit()
 
-cursorPROC.close()
-connPROC.close()
+use_cursor.close()
+use_conn.close()

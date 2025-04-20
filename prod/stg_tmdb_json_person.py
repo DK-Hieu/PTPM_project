@@ -1,8 +1,9 @@
 '''
 ===========================================================================================================================================
-2025-04-17 - hieudd - code crawl dữ liệu Movie_credits từ TMDB database vào database staging.stg_tmdb_json_movie_credits
+2025-04-17 - hieudd - code crawl dữ liệu Movie_metadata từ TMDB database vào database staging.stg_tmdb_json_movie_metadata
 ===========================================================================================================================================
 '''
+
 import dask.dataframe as dd
 import pandas as pd
 import numpy as np
@@ -42,7 +43,7 @@ cursorPROC = connPROC.cursor()
 
 #----------------------------------------------
 
-use_core = coreproc 
+use_core = coreproc
 use_conn = connPROC
 use_cursor = cursorPROC
 
@@ -50,15 +51,18 @@ use_cursor = cursorPROC
 
 def check_list(sql_table_object):
     sql_query = f'''
-                select distinct id from {sql_table_object}
+                    select distinct id from {sql_table_object}
                 '''
     list_sql_object = use_core.selectdf(sql_query)
     list_sql_object.sort_values(by='id',inplace=True)
     
     sql_query = '''
-            select distinct tmdbid id from staging.stg_links
-            where tmdbid is not null
-            '''
+                    select distinct actor_id id
+                    from staging.stg_cast ac
+                    union 
+                    select distinct cr.crew_id
+                    from staging.stg_crew cr
+                '''
     list_sql_all = use_core.selectdf(sql_query)
     list_sql_all.sort_values(by='id',inplace=True)
     
@@ -66,22 +70,23 @@ def check_list(sql_table_object):
     list_crwal.sort()
     return list_crwal
 
-# Movie_credits
+# Movie_metadata
 
-sql_table_name = 'staging.stg_tmdb_json_movie_credits'
+sql_table_name = 'staging.stg_tmdb_json_person'
 
 list_m = check_list(sql_table_name)
 
 for i in tqdm(list_m):
     try:
         time.sleep(0.01)
-        tmdb_id = i
+        person_id = i
 
-        url = f"https://api.themoviedb.org/3/movie/{tmdb_id}/credits?language=en-US"
+        url = f"https://api.themoviedb.org/3/person/{person_id}?language=en-US"
 
         headers = {
-                    "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlNWEzMGJmNWQyYmU5YzdiNzUwNTQ5ZTc3NTc1YTQ5OCIsIm5iZiI6MTc0Mjc0ODk0Ny44LCJzdWIiOiI2N2UwM2QxMzIxMGZhODBhMGY0ZGE4NzMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.3Jf337Oe9cB_nBG4kCFfxnLYNpEXcm13G92QoBJSf2k"     
-                }
+            "accept": "application/json",
+            "Authorization": "Bearer eyJhbGciOiJIUzI1NiJ9.eyJhdWQiOiJlNWEzMGJmNWQyYmU5YzdiNzUwNTQ5ZTc3NTc1YTQ5OCIsIm5iZiI6MTc0Mjc0ODk0Ny44LCJzdWIiOiI2N2UwM2QxMzIxMGZhODBhMGY0ZGE4NzMiLCJzY29wZXMiOlsiYXBpX3JlYWQiXSwidmVyc2lvbiI6MX0.3Jf337Oe9cB_nBG4kCFfxnLYNpEXcm13G92QoBJSf2k"
+        }
 
         response = requests.get(url, headers=headers)
         data = response.json()
@@ -89,7 +94,7 @@ for i in tqdm(list_m):
 
         sql_q = f"INSERT INTO {sql_table_name} (id, request_json) VALUES (%s, %s)"
 
-        use_cursor.execute(sql_q,(tmdb_id,data_str))
+        use_cursor.execute(sql_q,(person_id,data_str))
         use_conn.commit()
     except:
         print(f'Lỗi dữ liệu: {i}')
