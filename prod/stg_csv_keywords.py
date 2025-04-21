@@ -30,6 +30,8 @@ q = '''
     '''
 
 stg_links = usecore.selectdf(q)
+stg_links_list = list(set(stg_links['movieid'].values))
+stg_links_list.sort()
 
 pathfolder = r'F:\Work\Caohoc_2024_2026\PTPM_project\ml-latest'
 
@@ -40,8 +42,7 @@ moives_tags['tag'] = moives_tags['tag'].replace('',np.nan)
 moives_tags.rename(columns={'tag':'keywords'},inplace=True)
 moives_tags['keyid'] = moives_tags['userId'].astype('int').astype('str') + moives_tags['movieId'].astype('int').astype('str') + moives_tags['timestamp'].astype('int').astype('str')
 moives_tags = moives_tags[['keyid','userId','movieId','keywords','date_tag']]
-moives_tags = moives_tags[moives_tags['movieId'].isin([stg_links['movieid']])]
-
+moives_tags = moives_tags[moives_tags['movieId'].isin(stg_links_list)]
 print(moives_tags.isnull().sum())
 
 coreproc.sql_insert_py(

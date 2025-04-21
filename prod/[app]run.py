@@ -4,8 +4,9 @@ import sys
 import os
 
 files_to_run = ['stg_csv_links.py', 'stg_tmdb_json_movie_metadata.py', 'stg_tmdb_json_movie_credits.py',
-                'stg_tmdb_cast.py','stg_tmdb_crew.py', 'stg_tmdb_json_person.py'
-                # 'stg_csv_keywords.py','stg_csv_ratings.py'
+                'stg_tmdb_cast.py','stg_tmdb_crew.py', 
+                # 'stg_tmdb_json_person.py'
+                'stg_csv_keywords.py','stg_csv_ratings.py'
                 ]
 # data_folder = "output"  # Đây là nơi chứa dữ liệu được tạo bởi các file
 

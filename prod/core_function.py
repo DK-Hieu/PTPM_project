@@ -16,7 +16,6 @@ import psycopg2
 class coreproc:
     from tqdm.auto import tqdm
 
-    
     import sys
 
     if sys.platform == "win32":

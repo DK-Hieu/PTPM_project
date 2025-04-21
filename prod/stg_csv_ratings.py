@@ -30,6 +30,8 @@ q = '''
     '''
 
 stg_links = usecore.selectdf(q)
+stg_links_list = list(set(stg_links['movieid'].values))
+stg_links_list.sort()
 
 pathfolder = r'F:\Work\Caohoc_2024_2026\PTPM_project\ml-latest'
 
@@ -39,7 +41,7 @@ movies_ratings['date_rate'] = pd.to_datetime(movies_ratings['timestamp'],unit='s
 del movies_ratings['timestamp']
 movies_ratings.sort_values(by=['date_rate'],inplace=True)
 movies_ratings = movies_ratings[['keyid','userId','movieId','rating','date_rate']]
-movies_ratings = movies_ratings[movies_ratings['movieId'].isin([stg_links['movieid']])]
+movies_ratings = movies_ratings[movies_ratings['movieId'].isin(stg_links_list)]
 
 print(movies_ratings.isnull().sum())
 
