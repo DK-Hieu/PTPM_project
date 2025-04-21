@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import time
 import json
 import ast
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import requests
 import warnings
 warnings.filterwarnings('ignore') # turn off warnings
@@ -40,7 +40,7 @@ creadit = coreuat.selectdf(q)
 
 cast_crew_list = []
 
-for i in tqdm((set(creadit['id']))):
+for i in tqdm(set(creadit['id']),total=len(set(creadit['id'])),desc='Import data'):
     datastr = creadit[creadit['id']==i]['request_json'].values[0]
     data = json.loads(f'''{datastr}''')
     cast_crew_list.append(data)
@@ -56,7 +56,7 @@ listrun = creaditdf['id']
 
 # listrun = [2]
 
-for i in tqdm(set(listrun)):
+for i in tqdm(set(listrun),total=len(set(listrun)),desc='Processing data'):
     dataf = cast_raw[cast_raw['id']==i]['cast'].values[0]
     numb_cast = len(dataf)
     for y in range(len(dataf)):

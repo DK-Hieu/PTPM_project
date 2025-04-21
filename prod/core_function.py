@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 import time
 import json
 import ast
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import requests
 import warnings
 warnings.filterwarnings('ignore') # turn off warnings
@@ -14,6 +14,8 @@ warnings.filterwarnings('ignore') # turn off warnings
 import psycopg2
 
 class coreproc:
+    from tqdm.auto import tqdm
+
     
     import sys
 
@@ -67,6 +69,13 @@ class coreproc:
         
 
 class coreuat:
+    from tqdm.auto import tqdm
+
+    import sys
+
+    if sys.platform == "win32":
+        sys.stdout.reconfigure(encoding='utf-8')
+    
     conn = psycopg2.connect(
         host='localhost',
         database='uat',

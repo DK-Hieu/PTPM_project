@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import time
 import json
 import ast
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import requests
 import warnings
 warnings.filterwarnings('ignore') # turn off warnings

@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import time
 import json
 import ast
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import requests
 import warnings
 warnings.filterwarnings('ignore') # turn off warnings
@@ -20,6 +20,16 @@ warnings.filterwarnings('ignore') # turn off warnings
 import psycopg2
 
 from core_function import *
+
+usecore = coreproc
+
+q = '''
+        select distinct movieid
+        from staging.stg_links
+        order by movieid 
+    '''
+
+stg_links = usecore.selectdf(q)
 
 pathfolder = r'F:\Work\Caohoc_2024_2026\PTPM_project\ml-latest'
 
@@ -30,7 +40,7 @@ moives_tags['tag'] = moives_tags['tag'].replace('',np.nan)
 moives_tags.rename(columns={'tag':'keywords'},inplace=True)
 moives_tags['keyid'] = moives_tags['userId'].astype('int').astype('str') + moives_tags['movieId'].astype('int').astype('str') + moives_tags['timestamp'].astype('int').astype('str')
 moives_tags = moives_tags[['keyid','userId','movieId','keywords','date_tag']]
-moives_tags = moives_tags.head(20000)
+moives_tags = moives_tags[moives_tags['movieId'].isin([stg_links['movieid']])]
 
 print(moives_tags.isnull().sum())
 

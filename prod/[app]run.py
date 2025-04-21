@@ -25,7 +25,7 @@ for file in files_to_run:
         result = subprocess.run(
             [python_env_path, file],
             check=True,
-            capture_output=True,
+            # capture_output=True,
             text=True,
             cwd= r'F:\Work\Caohoc_2024_2026\PTPM_project\PTPM\prod'
         )

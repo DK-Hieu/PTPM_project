@@ -12,7 +12,7 @@ from datetime import datetime, timedelta
 import time
 import json
 import ast
-from tqdm import tqdm
+from tqdm.auto import tqdm
 import requests
 import warnings
 warnings.filterwarnings('ignore') # turn off warnings
@@ -20,6 +20,16 @@ warnings.filterwarnings('ignore') # turn off warnings
 import psycopg2
 
 from core_function import *
+
+usecore = coreproc
+
+q = '''
+        select distinct movieid
+        from staging.stg_links
+        order by movieid 
+    '''
+
+stg_links = usecore.selectdf(q)
 
 pathfolder = r'F:\Work\Caohoc_2024_2026\PTPM_project\ml-latest'
 
@@ -29,7 +39,7 @@ movies_ratings['date_rate'] = pd.to_datetime(movies_ratings['timestamp'],unit='s
 del movies_ratings['timestamp']
 movies_ratings.sort_values(by=['date_rate'],inplace=True)
 movies_ratings = movies_ratings[['keyid','userId','movieId','rating','date_rate']]
-movies_ratings = movies_ratings.head(10000)
+movies_ratings = movies_ratings[movies_ratings['movieId'].isin([stg_links['movieid']])]
 
 print(movies_ratings.isnull().sum())
 
