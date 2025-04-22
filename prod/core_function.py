@@ -35,6 +35,17 @@ class coreproc:
         df = pd.read_sql(query, coreproc.conn)
         return df
     
+    def disconnect():
+        try:
+            if coreproc.cursor:
+                coreproc.cursor.close()
+            if coreproc.conn:
+                coreproc.conn.close()
+            print("Disconnected from database.")
+        except Exception as e:
+            print(f"Lỗi khi đóng kết nối: {e}")    
+        
+    
     def truncate_table(sql_table_name):
         sql_query = f'truncate table {sql_table_name}'
         coreproc.cursor.execute(sql_query)
@@ -63,8 +74,10 @@ class coreproc:
 
         # Sau khi xong thì commit lại
         coreproc.conn.commit()
+        coreproc.disconnect()
         print("PUSH DATA: DONE")
-        
+    
+
         
 
 class coreuat:
@@ -89,10 +102,21 @@ class coreuat:
         df = pd.read_sql(query, coreuat.conn)
         return df
     
+    def disconnect():
+        try:
+            if coreuat.cursor:
+                coreuat.cursor.close()
+            if coreuat.conn:
+                coreuat.conn.close()
+            print("Disconnected from database.")
+        except Exception as e:
+            print(f"Lỗi khi đóng kết nối: {e}") 
+    
     def truncate_table(sql_table_name):
         sql_query = f'truncate table {sql_table_name}'
         coreuat.cursor.execute(sql_query)
         coreuat.conn.commit() 
+        
     
     def sql_insert(sql_table_name,python_table,inplace):
         python_table.replace([np.nan], [None],inplace=True)
@@ -116,5 +140,7 @@ class coreuat:
 
         # Sau khi xong thì commit lại
         coreuat.conn.commit()
+        coreuat.disconnect()
         print("PUSH DATA: DONE")
         
+    

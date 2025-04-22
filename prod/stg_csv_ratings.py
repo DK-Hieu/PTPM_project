@@ -36,10 +36,12 @@ stg_links_list.sort()
 pathfolder = r'F:\Work\Caohoc_2024_2026\PTPM_project\ml-latest'
 
 movies_ratings = pd.read_csv(os.path.join(pathfolder,'ratings.csv'))
-movies_ratings['keyid'] = movies_ratings['userId'].astype('str') + movies_ratings['movieId'].astype('str') + movies_ratings['timestamp'].astype('str')
+movies_ratings['keyid'] = movies_ratings['userId'].astype('str') + \
+                          movies_ratings['movieId'].astype('str') + \
+                          movies_ratings['timestamp'].astype('str')
 movies_ratings['date_rate'] = pd.to_datetime(movies_ratings['timestamp'],unit='s')
 del movies_ratings['timestamp']
-movies_ratings.sort_values(by=['date_rate'],inplace=True)
+movies_ratings.sort_values(by=['date_rate','movieId','userId'],inplace=True)
 movies_ratings = movies_ratings[['keyid','userId','movieId','rating','date_rate']]
 movies_ratings = movies_ratings[movies_ratings['movieId'].isin(stg_links_list)]
 

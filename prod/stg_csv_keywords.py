@@ -36,11 +36,17 @@ stg_links_list.sort()
 pathfolder = r'F:\Work\Caohoc_2024_2026\PTPM_project\ml-latest'
 
 moives_tags = pd.read_csv(os.path.join(pathfolder,'tags.csv'))
+moives_tags.sort_values(by=['timestamp','movieId','userId'],inplace=True)
+moives_tags.reset_index(drop=True,inplace=True)
+moives_tags.reset_index(inplace=True)
 moives_tags['date_tag'] = pd.to_datetime(moives_tags['timestamp'],unit='s')
 moives_tags['tag'] = moives_tags['tag'].str.lower().str.strip()
 moives_tags['tag'] = moives_tags['tag'].replace('',np.nan)
 moives_tags.rename(columns={'tag':'keywords'},inplace=True)
-moives_tags['keyid'] = moives_tags['userId'].astype('int').astype('str') + moives_tags['movieId'].astype('int').astype('str') + moives_tags['timestamp'].astype('int').astype('str')
+moives_tags['keyid'] = moives_tags['userId'].astype('int').astype('str') + \
+                       moives_tags['movieId'].astype('int').astype('str') + \
+                       moives_tags['timestamp'].astype('int').astype('str') + \
+                       moives_tags.index.astype('str')    
 moives_tags = moives_tags[['keyid','userId','movieId','keywords','date_tag']]
 moives_tags = moives_tags[moives_tags['movieId'].isin(stg_links_list)]
 print(moives_tags.isnull().sum())
