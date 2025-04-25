@@ -1,6 +1,6 @@
 '''
 ===========================================================================================================================================
-2025-04-17 - hieudd - code crawl dữ liệu rating từ dataset .csv vào database staging.stg_keyword
+ETL - Bảng stg_keyword từ file CSV
 ===========================================================================================================================================
 '''
 
@@ -49,6 +49,7 @@ moives_tags['keyid'] = moives_tags['userId'].astype('int').astype('str') + \
                        moives_tags.index.astype('str')    
 moives_tags = moives_tags[['keyid','userId','movieId','keywords','date_tag']]
 moives_tags = moives_tags[moives_tags['movieId'].isin(stg_links_list)]
+moives_tags.rename(columns={'movieId':'movieid','userId':'userid'},inplace=True)
 print(moives_tags.isnull().sum())
 
 coreproc.sql_insert_py(

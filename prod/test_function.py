@@ -1,9 +1,3 @@
-'''
-===========================================================================================================================================
-ETL bảng stg_links từ file CSV
-===========================================================================================================================================
-'''
-
 import dask.dataframe as dd
 import pandas as pd
 import numpy as np
@@ -30,12 +24,17 @@ links.sort_values(by='tmdbId',inplace=True)
 # links = links[['keyid','movieId','imdbId','tmdbId']]
 links = links[['movieId','imdbId','tmdbId']]
 links.rename(columns={'movieId':'movieid','imdbId':'imdbid','tmdbId':'tmdbid'},inplace=True)
-links = links.head(20000)
+links = links.head(5000)
 
 print(links.isnull().sum())
+
+# print(coreproc.sql_append_check(
+#          sql_table_name='staging.stg_links',
+#          python_table=links
+#                                ))
 
 coreproc.sql_insert_py(
          sql_table_name='staging.stg_links',
          python_table=links,
-         inplace= True
+         inplace= False
         )

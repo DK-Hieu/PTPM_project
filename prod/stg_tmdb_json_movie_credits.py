@@ -1,6 +1,7 @@
 '''
 ===========================================================================================================================================
-2025-04-17 - hieudd - code crawl dữ liệu Movie_credits từ TMDB database vào database staging.stg_tmdb_json_movie_credits
+ELT dữ liệu raw từ TMDB vào stg_tmdb_json_movie_credits /
+(Dữ liệu gốc của cast, crew) 
 ===========================================================================================================================================
 '''
 import dask.dataframe as dd

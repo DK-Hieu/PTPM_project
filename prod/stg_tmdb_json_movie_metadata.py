@@ -1,6 +1,7 @@
 '''
 ===========================================================================================================================================
-2025-04-17 - hieudd - code crawl dữ liệu Movie_metadata từ TMDB database vào database staging.stg_tmdb_json_movie_metadata
+ELT dữ liệu raw từ TMDB vào stg_tmdb_json_movie_metadata 
+(Dữ liệu gốc của movie_metadata, collection, genres)
 ===========================================================================================================================================
 '''
 

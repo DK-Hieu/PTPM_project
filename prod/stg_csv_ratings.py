@@ -1,6 +1,6 @@
 '''
 ===========================================================================================================================================
-2025-04-17 - hieudd - code crawl dữ liệu rating từ dataset .csv vào database staging.stg_ratings
+ETL bảng stg_ratings từ CSV
 ===========================================================================================================================================
 '''
 
@@ -44,6 +44,7 @@ del movies_ratings['timestamp']
 movies_ratings.sort_values(by=['date_rate','movieId','userId'],inplace=True)
 movies_ratings = movies_ratings[['keyid','userId','movieId','rating','date_rate']]
 movies_ratings = movies_ratings[movies_ratings['movieId'].isin(stg_links_list)]
+movies_ratings.rename(columns={'movieId':'movieid','userId':'userid'},inplace=True)
 
 print(movies_ratings.isnull().sum())
 

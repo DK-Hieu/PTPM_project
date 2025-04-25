@@ -51,12 +51,45 @@ class coreproc:
         coreproc.cursor.execute(sql_query)
         coreproc.conn.commit()        
     
+    def primary_key_take(sql_table_name):
+        q = f'''
+                SELECT
+                    a.attname AS column_name
+                FROM
+                    pg_index i
+                JOIN
+                    pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+                JOIN
+                    pg_class c ON c.oid = i.indrelid
+                JOIN
+                    pg_namespace n ON n.oid = c.relnamespace
+                WHERE
+                    i.indisprimary = true
+                    AND (n.nspname || '.' || c.relname) = '{sql_table_name}';
+            '''
+        column_name = coreproc.selectdf(q)
+        return column_name['column_name'][0]
+        
+        
+    def sql_append_check(sql_table_name,python_table):
+        pk = coreproc.primary_key_take(sql_table_name)
+        q = f'''select distinct {pk} from {sql_table_name}'''
+        sqldf = coreproc.selectdf(q)
+        sqlkeyid = set(sqldf[f'{pk}'])
+        pythonkeyid = set(python_table[f'{pk}'])
+        updatelist = list(pythonkeyid - sqlkeyid)
+        updatedf = python_table[python_table[f'{pk}'].isin(updatelist)]
+        return updatedf        
+         
+         
     def sql_insert_py(sql_table_name,python_table,inplace):
         
         python_table.replace([np.nan], [None],inplace=True)
         
         if inplace == True:
             coreproc.truncate_table(sql_table_name)
+        if inplace == False:
+            python_table = coreproc.sql_append_check(sql_table_name,python_table)
         else:
             pass
                 
@@ -117,12 +150,45 @@ class coreuat:
         coreuat.cursor.execute(sql_query)
         coreuat.conn.commit() 
         
+    def primary_key_take(sql_table_name):
+        q = f'''
+                SELECT
+                    a.attname AS column_name
+                FROM
+                    pg_index i
+                JOIN
+                    pg_attribute a ON a.attrelid = i.indrelid AND a.attnum = ANY(i.indkey)
+                JOIN
+                    pg_class c ON c.oid = i.indrelid
+                JOIN
+                    pg_namespace n ON n.oid = c.relnamespace
+                WHERE
+                    i.indisprimary = true
+                    AND (n.nspname || '.' || c.relname) = '{sql_table_name}';
+            '''
+        column_name = coreuat.selectdf(q)
+        return column_name
+        
+        
+    def sql_append_check(sql_table_name,python_table):
+        pk = coreuat.primary_key_take(sql_table_name)
+        q = f'''select distinct {pk} from {sql_table_name}'''
+        sqldf = coreuat.selectdf(q)
+        sqlkeyid = set(sqldf[f'{pk}'])
+        pythonkeyid = set(python_table[f'{pk}'])
+        updatelist = list(pythonkeyid - sqlkeyid)
+        updatedf = python_table[python_table[f'{pk}'].isin(updatelist)]
+        return updatedf  
     
-    def sql_insert(sql_table_name,python_table,inplace):
+    
+    def sql_insert_py(sql_table_name,python_table,inplace):
+        
         python_table.replace([np.nan], [None],inplace=True)
         
         if inplace == True:
             coreuat.truncate_table(sql_table_name)
+        if inplace == False:
+            python_table = coreuat.sql_append_check(sql_table_name,python_table)
         else:
             pass
                 
