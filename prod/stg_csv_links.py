@@ -30,7 +30,7 @@ links.sort_values(by='tmdbId',inplace=True)
 # links = links[['keyid','movieId','imdbId','tmdbId']]
 links = links[['movieId','imdbId','tmdbId']]
 links.rename(columns={'movieId':'movieid','imdbId':'imdbid','tmdbId':'tmdbid'},inplace=True)
-links = links.head(20000)
+# links = links.head(20000)
 
 print(links.isnull().sum())
 

@@ -61,7 +61,7 @@ files_to_run_all = [
 
 python_env_path = r"C:\Users\LENOVO\Envs\DK-local\Scripts\python.exe"
 
-files_to_run = files_to_run_all
+files_to_run = files_rawsoruce_to_datalake
 
 for file in files_to_run:
     print(f"\n▶️ Đang chạy {file}...")
